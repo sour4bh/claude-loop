@@ -1,0 +1,40 @@
+{
+  "name": "loop",
+  "version": "1.0.0",
+  "description": "Ralph Wiggum-style autonomous work loop with presets for UI, docs, code quality, and more",
+  "author": {
+    "name": "sour4bh"
+  },
+  "homepage": "https://github.com/sour4bh/claude-loop#readme",
+  "repository": "https://github.com/sour4bh/claude-loop",
+  "license": "MIT",
+  "keywords": [
+    "ralph-wiggum",
+    "ralph-loop",
+    "ralph",
+    "autonomous",
+    "autonomous-loop",
+    "autonomous-agent",
+    "agentic",
+    "agentic-coding",
+    "loop",
+    "stop-hook",
+    "self-correction",
+    "iterative",
+    "iteration",
+    "continuous-improvement",
+    "long-running",
+    "multi-task",
+    "backlog",
+    "task-management",
+    "exploration",
+    "exploitation",
+    "idle-detection",
+    "code-quality",
+    "ui-audit",
+    "documentation",
+    "code-review",
+    "tdd",
+    "refactoring"
+  ]
+}

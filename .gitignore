@@ -1,0 +1,21 @@
+# State files (project-specific)
+loop-state.local.md
+loop-state.backup.md
+loop-history/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
