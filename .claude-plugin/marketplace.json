@@ -1,0 +1,34 @@
+{
+  "name": "sour4bh",
+  "owner": {
+    "name": "sour4bh"
+  },
+  "metadata": {
+    "description": "Ralph Wiggum-style autonomous work loop plugin for Claude Code"
+  },
+  "plugins": [
+    {
+      "name": "loop",
+      "source": "./",
+      "description": "Ralph Wiggum-style autonomous work loop with presets for UI, docs, code quality, and more",
+      "version": "1.0.0",
+      "author": {
+        "name": "sour4bh"
+      },
+      "repository": "https://github.com/sour4bh/claude-loop",
+      "license": "MIT",
+      "keywords": [
+        "ralph-wiggum",
+        "ralph-loop",
+        "autonomous",
+        "autonomous-loop",
+        "agentic",
+        "agentic-coding",
+        "stop-hook",
+        "continuous-improvement",
+        "code-quality",
+        "ui-audit"
+      ]
+    }
+  ]
+}

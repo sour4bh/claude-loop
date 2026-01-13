@@ -1,0 +1,52 @@
+# claude-loop preset definitions
+# Exploitation suggestions only - exploration mode uses the Explore subagent
+
+[generic]
+description = "General continuous improvement"
+exploitation = [
+    "Complete your current task before moving on",
+    "Finish what you started - don't leave work half-done",
+    "Verify your recent changes actually work",
+    "Check your backlog and pick the highest priority item",
+    "Update the state file with your current focus",
+]
+
+[ui]
+description = "UI audit and visual consistency"
+exploitation = [
+    "Complete the current component before moving to the next",
+    "Verify the fix works on both desktop and mobile",
+    "Check your backlog for pending UI issues",
+    "Test keyboard navigation and focus states",
+    "Update the state file with current component focus",
+]
+
+[code-quality]
+description = "Code quality and technical debt"
+exploitation = [
+    "Finish refactoring the current function before moving on",
+    "Verify your refactor didn't break anything",
+    "Check your backlog for the next code smell to fix",
+    "Run the linter/type checker to validate changes",
+    "Update the state file with refactoring progress",
+]
+
+[docs]
+description = "Documentation improvement"
+exploitation = [
+    "Finish documenting the current section completely",
+    "Verify the code example you wrote actually runs",
+    "Check your backlog for undocumented areas",
+    "Check for broken links and missing references",
+    "Update the state file with documentation progress",
+]
+
+[review]
+description = "Code review and quality check"
+exploitation = [
+    "Complete your review of the current file",
+    "Verify the issue you found is actually a bug",
+    "Check your backlog for files you haven't reviewed yet",
+    "Check if tests cover the new behavior",
+    "Update the state file with review findings",
+]
