@@ -2,113 +2,58 @@
 description: {{DESCRIPTION}}
 ---
 
-# Autonomous Loop: {{PRESET_NAME}}
+# {{PRESET_NAME}} Loop
 
-You are starting an autonomous work loop. This loop continues until max iterations, idle timeout, or user cancellation.
+**Args:** $ARGUMENTS
 
-**Arguments provided:** $ARGUMENTS
+## Arguments
 
-## Parse Arguments
-
-Extract from arguments:
-- **prompt**: The work scope/task description (required)
-- **--max-iterations N**: Maximum iterations (default: 50)
-- **--resume**: Continue from existing state file
-- **--tasks "..."**: Semicolon-separated tasks
-- **--task-mode**: Process tasks sequentially (one per cycle)
-- **--context "..."**: Tools and workflow context (persists across iterations)
+- `prompt` (required): Work scope
+- `--max-iterations N`: Limit (default: 50)
+- `--resume`: Continue existing loop
+- `--tasks "a; b; c"`: Seed backlog
+- `--task-mode`: One task per cycle
+- `--context "..."`: Persistent context
 {{SUGGESTIONS_PARAM}}
 
-## Your Task
+## Start Loop
 
-### 1. Handle State File
+**If `--resume`:** Read `.claude/loop-state.local.md`, error if missing.
 
-**If `--resume` flag is present:**
-- Read existing `.claude/loop-state.local.md`
-- If file doesn't exist, report error: "No active loop to resume. Start without --resume."
-- Continue from current state
+**New loop:** Create state file:
 
-**If NOT resuming (new loop):**
-- If state file exists, warn user and overwrite
-- Create new state file using the Write tool
-
-Write to `.claude/loop-state.local.md`:
 ```markdown
 ---
-mode: {{MODE}}
 preset: {{PRESET_KEY}}
 iteration: 1
-max_iterations: [extracted or 50]
-scope: [the prompt]
+max_iterations: [N or 50]
+scope: [prompt]
 idle_streak: 0
 exploration_streak: 0
-{{TASK_MODE_FIELDS}}
 ---
 
 ## Scope
-[The work scope from the prompt]
+[prompt]
 
 ## Context
-[If --context provided, include it here. Otherwise omit this section.]
-Available tools, workflow patterns, and other persistent context for each iteration.
+[--context value if provided]
 
 ## Current Focus
-[What you're currently working on]
+[current task]
 
 ## Backlog
-{{BACKLOG_INIT}}
+[discovered tasks]
 
 ## Completed
-(What you've accomplished)
-
-## Notes
-(Observations, blockers, ideas)
+[done items]
 ```
 
-### 2. Confirm Loop Started
+Confirm: scope, preset ({{PRESET_NAME}}), max iterations, cancel with `/loop:cancel`.
 
-Tell the user:
-- What you'll be working on
-- Preset: {{PRESET_NAME}}
-- Max iterations configured
-- How to cancel: `/loop:cancel`
-
-### 3. Work Autonomously
+## Work
 
 {{WORK_INSTRUCTIONS}}
 
-### 4. Update State File Regularly
+Update state file as you work. Signal completion with `<cycle_complete>done: X\nfound: Y</cycle_complete>`.
 
-Keep the state file current:
-- Update "Current Focus" when switching tasks
-- Add completed items to "Completed" section
-- Add discovered issues to "Backlog"
-- Update notes with observations
-
-### 5. Signal Cycle Completion (Optional)
-
-When you complete a meaningful chunk of work:
-```xml
-<cycle_complete>
-done: [what you accomplished]
-found: [new issues discovered]
-</cycle_complete>
-```
-
-## Work Philosophy
-
-- **Stay focused** - Keep work aligned with the original scope
-- **Document progress** - Update state file with your current focus
-- **Be thorough** - Don't just do the minimum
-- **Prioritize** - Important issues first, note minor ones for later
-
-## The Loop Continues
-
-The stop hook will prompt you to continue with contextual suggestions.
-Only stops when:
-- Max iterations reached
-- 5 consecutive idle iterations (no progress)
-- 3 consecutive exploration attempts with empty backlog (work exhausted)
-- User runs `/loop:cancel`
-
-**Your work persists in files between iterations.**
+Loop continues until max iterations, 5 idle iterations, or `/loop:cancel`.
