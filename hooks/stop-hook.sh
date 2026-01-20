@@ -40,7 +40,7 @@ EXPLORATION_STREAK=$(parse_state "exploration_streak" "0")
 # Parse Context section (multi-line)
 parse_section() {
   local section="$1"
-  sed -n "/^## ${section}$/,/^## /p" "$STATE_FILE" | sed '1d;$d' | head -10
+  sed -n "/^## ${section}$/,/^## /p" "$STATE_FILE" | sed '1d;$d'
 }
 CONTEXT=$(parse_section "Context" 2>/dev/null || echo "")
 
@@ -61,34 +61,48 @@ archive_state() {
   rm -f "$STATE_FILE"
 }
 
+# Get config from preset (includes thresholds)
+SUGGESTION=""
+IDLE_THRESHOLD=5
+EXPLORATION_THRESHOLD=3
+NEXT_ITER=$((ITERATION + 1))
+
+if command -v python &>/dev/null; then
+  SUGGESTION_JSON=$(python "$SCRIPTS_DIR/get-suggestion.py" "$PRESET" "$NEXT_ITER" 2>/dev/null || echo '{}')
+  SUGGESTION=$(echo "$SUGGESTION_JSON" | jq -r '.suggestion // empty')
+  IDLE_THRESHOLD=$(echo "$SUGGESTION_JSON" | jq -r '.idle_threshold // 5')
+  EXPLORATION_THRESHOLD=$(echo "$SUGGESTION_JSON" | jq -r '.exploration_threshold // 3')
+fi
+
+# Validate numeric thresholds
+[[ "$IDLE_THRESHOLD" =~ ^[0-9]+$ ]] || IDLE_THRESHOLD=5
+[[ "$EXPLORATION_THRESHOLD" =~ ^[0-9]+$ ]] || EXPLORATION_THRESHOLD=3
+
 # Max iterations reached - archive and stop
 if [[ $ITERATION -ge $MAX_ITER ]]; then
   archive_state
   exit 0
 fi
 
-# Idle detection - stop after 5 consecutive idle iterations
-if [[ $IDLE_STREAK -ge 5 ]]; then
+# Idle detection - threshold=0 disables this check
+if [[ $IDLE_THRESHOLD -gt 0 ]] && [[ $IDLE_STREAK -ge $IDLE_THRESHOLD ]]; then
   archive_state
-  jq -n --arg reason "🛑 Loop stopped after 5 idle iterations with no progress.
+  jq -n --arg reason "🛑 Loop stopped after $IDLE_THRESHOLD idle iterations with no progress.
 Scope was: $SCOPE
 Final stats: $ISSUES_FOUND found, $ISSUES_FIXED fixed" \
     '{"decision": "block", "reason": $reason}'
   exit 0
 fi
 
-# Exploration exhaustion - stop after 3 consecutive exploration iterations with empty backlog
-if [[ $EXPLORATION_STREAK -ge 3 ]]; then
+# Exploration exhaustion - threshold=0 disables this check (useful for QA discovery workflows)
+if [[ $EXPLORATION_THRESHOLD -gt 0 ]] && [[ $EXPLORATION_STREAK -ge $EXPLORATION_THRESHOLD ]]; then
   archive_state
-  jq -n --arg reason "✅ Loop complete - exploration found no more work after 3 attempts.
+  jq -n --arg reason "✅ Loop complete - exploration found no more work after $EXPLORATION_THRESHOLD attempts.
 Scope was: $SCOPE
 Final stats: $ISSUES_FOUND found, $ISSUES_FIXED fixed" \
     '{"decision": "block", "reason": $reason}'
   exit 0
 fi
-
-# Increment iteration
-NEXT_ITER=$((ITERATION + 1))
 
 # Check for cycle completion signal in transcript
 TRANSCRIPT_PATH=$(echo "$HOOK_INPUT" | jq -r '.transcript_path // ""')
@@ -107,6 +121,11 @@ if [[ -z "$BACKLOG" ]] || [[ "$BACKLOG" =~ ^[[:space:]]*$ ]] || [[ "$BACKLOG" =~
   BACKLOG_EMPTY=true
 fi
 
+# Override: backlog with unchecked items = not empty (QA workflows use checkboxes)
+if [[ "$BACKLOG" =~ \-[[:space:]]*\[[[:space:]]\] ]]; then
+  BACKLOG_EMPTY=false
+fi
+
 # Determine if exploration is appropriate (vs exploitation/focus)
 # Explore when: cycle complete OR backlog is empty (nothing to work on)
 SHOULD_EXPLORE=false
@@ -120,13 +139,6 @@ if [[ "$SHOULD_EXPLORE" == "true" ]] && [[ "$BACKLOG_EMPTY" == "true" ]]; then
   NEW_EXPLORATION_STREAK=$((EXPLORATION_STREAK + 1))
 else
   NEW_EXPLORATION_STREAK=0
-fi
-
-# Get rotating suggestion from presets (exploitation only - exploration uses Explore subagent)
-SUGGESTION=""
-if command -v python &>/dev/null; then
-  SUGGESTION_JSON=$(python "$SCRIPTS_DIR/get-suggestion.py" "$PRESET" "$NEXT_ITER" 2>/dev/null || echo '{}')
-  SUGGESTION=$(echo "$SUGGESTION_JSON" | jq -r '.suggestion // empty')
 fi
 
 # Detect idle state (no git changes and no state file changes)

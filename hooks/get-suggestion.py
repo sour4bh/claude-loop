@@ -58,11 +58,17 @@ def get_suggestion(preset: str, iteration: int) -> dict:
     index = iteration % len(suggestions)
     suggestion = suggestions[index]
 
+    # Get threshold config (defaults for backward compatibility)
+    idle_threshold = preset_data.get("idle_threshold", 5)
+    exploration_threshold = preset_data.get("exploration_threshold", 3)
+
     return {
         "preset": preset,
         "suggestion": suggestion,
         "suggestion_index": index,
         "total_suggestions": len(suggestions),
+        "idle_threshold": idle_threshold,
+        "exploration_threshold": exploration_threshold,
     }
 
 

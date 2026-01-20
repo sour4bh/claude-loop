@@ -3,6 +3,8 @@
 
 [generic]
 description = "General continuous improvement"
+idle_threshold = 5
+exploration_threshold = 3
 exploitation = [
     "Complete your current task before moving on",
     "Finish what you started - don't leave work half-done",
@@ -13,6 +15,8 @@ exploitation = [
 
 [ui]
 description = "UI audit and visual consistency"
+idle_threshold = 5
+exploration_threshold = 3
 exploitation = [
     "Complete the current component before moving to the next",
     "Verify the fix works on both desktop and mobile",
@@ -23,6 +27,8 @@ exploitation = [
 
 [code-quality]
 description = "Code quality and technical debt"
+idle_threshold = 5
+exploration_threshold = 3
 exploitation = [
     "Finish refactoring the current function before moving on",
     "Verify your refactor didn't break anything",
@@ -33,6 +39,8 @@ exploitation = [
 
 [docs]
 description = "Documentation improvement"
+idle_threshold = 5
+exploration_threshold = 3
 exploitation = [
     "Finish documenting the current section completely",
     "Verify the code example you wrote actually runs",
@@ -43,10 +51,24 @@ exploitation = [
 
 [review]
 description = "Code review and quality check"
+idle_threshold = 5
+exploration_threshold = 3
 exploitation = [
     "Complete your review of the current file",
     "Verify the issue you found is actually a bug",
     "Check your backlog for files you haven't reviewed yet",
     "Check if tests cover the new behavior",
     "Update the state file with review findings",
+]
+
+[qa-audit]
+description = "QA audit - discovery focused"
+idle_threshold = 10
+exploration_threshold = 0  # Disabled - QA is about continuous discovery
+exploitation = [
+    "Document your current finding with exact file path and line number",
+    "Categorize the issue: CRITICAL/HIGH/MEDIUM/LOW with rationale",
+    "Check if this issue has related occurrences elsewhere",
+    "Estimate fix effort and add to the backlog",
+    "Update the state file with discovery progress",
 ]
